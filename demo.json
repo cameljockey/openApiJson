@@ -1,0 +1,1254 @@
+{
+  "openapi" : "3.0.1",
+  "info" : {
+    "title" : "Schema Mapping API",
+    "description" : "The <b>Schema Mapping API</b> are backend API's that provides the capabilities to UI to map schema of issuer File to Mastercard standard pre-processing  output schema. Key terms used in the API are described as:\n  <ol>\n  <li><b> Issuer Schema:</b> is a schema extracted out from Issuer File. </li>     \n    <li><b>IMP Standard Schema:</b> is the\nstandard output Schema that application should convert data into. </li>\n  <li><b> Request:</b> is a generic description of a request from a customer to convert, create and submit created Mapping between issuer Schema and IMP standard Schema for processing to DIP. DIP will then use this mapping file for data ingestion and return status. </li>\n  </ol>\n<p> An Authorization token must be provided by the application (UI) to access an API provided by this interface. Authorization token is acquired by providing login credentials as a part of the authentication process. </p>",
+    "contact" : {
+      "name" : "Mastercard Technical Support",
+      "email" : "GUSS@mastercard.com"
+    },
+    "version" : "1.0.0"
+  },
+  "servers" : [ {
+    "url" : "https://imp.mastercard.com/schemamapping/api",
+    "description" : "Production server - base URL to access the Schema Mapping APIs"
+  }, {
+    "url" : "https://staging.imp.mastercard.com/schemamapping/api",
+    "description" : "Staging server - base URL to access the Schema Mapping APIs"
+  } ],
+  "tags" : [ {
+    "name" : "Schema Mapping",
+    "description" : "Operations for Schema Mapping"
+  } ],
+  "paths" : {
+    "/issuers/{issuerId}/exchange_files" : {
+      "get" : {
+        "tags" : [ "Schema Mapping" ],
+        "summary" : "Fetch Issuer Files.",
+        "description" : "This API will be leveraged by the UI to get the list of files uploaded by  a specific Issuer. Based on the provided Issuer ID, the API will connect  to File Transfer service and get the list of files uploaded by the Issuer and  respond to the UI with the list of files available on File Transfer service.  If there is any error then error message will be returned. Certificates will  be used to authenticate with File Transfer service.\n",
+        "operationId" : "fetchIssuerFiles",
+        "parameters" : [ {
+          "name" : "X-Authorization",
+          "in" : "header",
+          "description" : "Authorization Token - This is dummy for now. The name of this parameter and value is still to be decided after proper review of security implementation.",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "Accept",
+          "in" : "header",
+          "description" : "application/json",
+          "required" : false,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "issuerId",
+          "in" : "path",
+          "description" : "Unique issuer identifier",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Success",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/File"
+                  }
+                },
+                "example" : [ {
+                  "id" : 4567743,
+                  "fileId" : "84e1c83b-6bb0-382b-bc61-a7a06e9471ad",
+                  "issuerId" : "settlement@boa",
+                  "name" : "xyz.csv",
+                  "description" : "The file is for dummy purpose.",
+                  "checksum" : "DFGH3466FGHJHG",
+                  "location" : "abc/fgh/xyz",
+                  "status" : "complete",
+                  "statustime" : "2018-04-29T20:15:33.000Z",
+                  "metadata" : "The metadata from File Exchange Service.",
+                  "contentType" : "TEXT",
+                  "fileProfile" : "Dummy",
+                  "fileAliases" : "Dummy",
+                  "type" : "issuer",
+                  "file" : "TBD",
+                  "format" : "CSV",
+                  "size" : 12345667
+                }, {
+                  "id" : 4567744,
+                  "fileId" : "44e1c83b-6bb0-302b-bc61-a7a06e9471rw",
+                  "issuerId" : "settlement@boa",
+                  "name" : "xyz.csv",
+                  "description" : "The file is for dummy purpose.",
+                  "checksum" : "AHBW3466FGHJHG",
+                  "location" : "abc/fgh/xyz",
+                  "status" : "complete",
+                  "statustime" : "2018-04-29T20:15:33.000Z",
+                  "metadata" : "The metadata from File Exchange Service.",
+                  "contentType" : "TEXT",
+                  "fileProfile" : "Dummy",
+                  "fileAliases" : "Dummy",
+                  "type" : "issuer",
+                  "file" : "TBD",
+                  "format" : "CSV",
+                  "size" : 12345667
+                } ]
+              }
+            }
+          },
+          "400" : {
+            "description" : "Bad Request",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/BadRequestErrors"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Unauthorized",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/UnauthorizedErrors"
+                }
+              }
+            }
+          },
+          "403" : {
+            "description" : "Forbidden",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ForbiddenErrors"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Not Found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/NotFoundErrors"
+                }
+              }
+            }
+          },
+          "422" : {
+            "description" : "Unprocessable Entity",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/UnprocessableEntityErrors"
+                }
+              }
+            }
+          },
+          "500" : {
+            "description" : "Service Unavailable",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/InternalServerErrors"
+                }
+              }
+            }
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ]
+      }
+    },
+    "/issuers/{issuerId}/exchange_files/{fileId}/schema" : {
+      "get" : {
+        "tags" : [ "Schema Mapping" ],
+        "summary" : "Fetch Issuer File Schema.",
+        "description" : "This API will be leveraged by the UI to get the schema of the file provided  as an Input. Based on the provided Issuer Name, recieverID, File ID and the  File Name, the API will connect to the File Transfer service and will “stream”  the header row of the file.  NOTE- To get this header we could not find any  service in Chariot Client SDK yet. So to get this service, we will be  connecting with File Exchange Service and other teams to build for us. In  case if we are required to build it ourselves by downloading file, then we  may have to decide, about how we can avoid breaching any security protocol  associated with PII and non-PII data. The file should be in CSV format. In  future it may have one of the following format CSV, TSV or Excel (including  Open Office spreadsheet). The true API will also reject files without any  header since in that case the header is in true terms data and the fields  may contain PII data too.\n",
+        "operationId" : "fetchIssuerFileSchema",
+        "parameters" : [ {
+          "name" : "X-Authorization",
+          "in" : "header",
+          "description" : "Authorization Token - This is dummy for now. The name of this parameter and value is still to be decided after proper review of security implementation.",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "Accept",
+          "in" : "header",
+          "description" : "application/json",
+          "required" : false,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "issuerId",
+          "in" : "path",
+          "description" : "Unique issuer identifier",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "fileId",
+          "in" : "path",
+          "description" : "Unique File identifier",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Success",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Schema"
+                },
+                "example" : {
+                  "name" : "Dummy Schema",
+                  "type" : "Source",
+                  "fields" : [ {
+                    "name" : "firstname",
+                    "type" : "text"
+                  }, {
+                    "name" : "lastname",
+                    "type" : "text"
+                  }, {
+                    "name" : "sex",
+                    "type" : "text"
+                  }, {
+                    "name" : "DOB",
+                    "type" : "date"
+                  } ]
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Bad Request",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/BadRequestErrors"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Unauthorized",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/UnauthorizedErrors"
+                }
+              }
+            }
+          },
+          "403" : {
+            "description" : "Forbidden",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ForbiddenErrors"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Not Found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/NotFoundErrors"
+                }
+              }
+            }
+          },
+          "422" : {
+            "description" : "Unprocessable Entity",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/UnprocessableEntityErrors"
+                }
+              }
+            }
+          },
+          "503" : {
+            "description" : "Service Unavailable",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/InternalServerErrors"
+                }
+              }
+            }
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ]
+      }
+    },
+    "/master/config/standard_schema" : {
+      "get" : {
+        "tags" : [ "Schema Mapping" ],
+        "summary" : "Fetch IMP Standard Schema.",
+        "description" : "This API will be leveraged by the UI to get the standard schema of the File  so that mapping can be carried out. If there is any error then error message  will be returned. Certificates will be used to authenticate with File Transfer  service.\n",
+        "operationId" : "fetchIMPStandardSchema",
+        "parameters" : [ {
+          "name" : "X-Authorization",
+          "in" : "header",
+          "description" : "Authorization Token - This is dummy for now. The name of this parameter and value is still to be decided after proper review of security implementation.",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "Accept",
+          "in" : "header",
+          "description" : "application/json",
+          "required" : false,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Success",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Schema"
+                },
+                "example" : {
+                  "name" : "Dummy Schema",
+                  "type" : "Source",
+                  "fields" : [ {
+                    "name" : "firstname",
+                    "type" : "text"
+                  }, {
+                    "name" : "lastname",
+                    "type" : "text"
+                  }, {
+                    "name" : "sex",
+                    "type" : "text"
+                  }, {
+                    "name" : "DOB",
+                    "type" : "date"
+                  } ]
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Bad Request",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/BadRequestErrors"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Unauthorized",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/UnauthorizedErrors"
+                }
+              }
+            }
+          },
+          "403" : {
+            "description" : "Forbidden",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ForbiddenErrors"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Not Found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/NotFoundErrors"
+                }
+              }
+            }
+          },
+          "422" : {
+            "description" : "Unprocessable Entity",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/UnprocessableEntityErrors"
+                }
+              }
+            }
+          },
+          "500" : {
+            "description" : "Service Unavailable",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/InternalServerErrors"
+                }
+              }
+            }
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ]
+      }
+    },
+    "/issuers/{issuerId}/campaigns/{campaignId}/files/{fileId}/mapping" : {
+      "post" : {
+        "tags" : [ "Schema Mapping" ],
+        "summary" : "Save Issuer Schema Mapping",
+        "description" : "This API will be leveraged by the UI to submit the final configuration  payload to DIP. The DIP will return with the Request ID for the submission.  And based on it UI will update status of the File (Unique ID + File Name)  as \"Request in Progress\" on successful submission of the request to DIP.  If there is any error then error message will be returned. Before executing  this API, any validation, mapping, add/delete of fields will happen.",
+        "operationId" : "addAppDocument",
+        "parameters" : [ {
+          "name" : "X-Authorization",
+          "in" : "header",
+          "description" : "Authorization Token - This is dummy for now. The name of this parameter and value is still to be decided after proper review of security implementation.",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "Accept",
+          "in" : "header",
+          "description" : "application/json",
+          "required" : false,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "issuerId",
+          "in" : "path",
+          "description" : "Unique issuer identifier",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "campaignId",
+          "in" : "path",
+          "description" : "Unique campaign identifier",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "fileId",
+          "in" : "path",
+          "description" : "Unique File identifier",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "requestBody" : {
+          "description" : "Request that is submitted to DIP for processing having mapping file",
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/Request"
+              },
+              "example" : {
+                "id" : "ZS33F3SZ3D",
+                "fileId" : "84e1c83b-6bb0-382b-bc61-a7a06e9471ad",
+                "fileName" : "abc.csv",
+                "status" : "submitted",
+                "processingMessage" : "File has been recieved."
+              }
+            }
+          }
+        },
+        "responses" : {
+          "201" : {
+            "description" : "Schema Mapping successfully created and submitted to DIP for processing.",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Request"
+                },
+                "example" : {
+                  "id" : "ZS33F3SZ3D",
+                  "fileId" : "84e1c83b-6bb0-382b-bc61-a7a06e9471ad",
+                  "fileName" : "abc.csv",
+                  "status" : "submitted",
+                  "processingMessage" : "File has been recieved."
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Bad Request",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/BadRequestErrors"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Unauthorized",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/UnauthorizedErrors"
+                }
+              }
+            }
+          },
+          "403" : {
+            "description" : "Forbidden",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ForbiddenErrors"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Not Found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/NotFoundErrors"
+                }
+              }
+            }
+          },
+          "422" : {
+            "description" : "Unprocessable Entity",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/UnprocessableEntityErrors"
+                }
+              }
+            }
+          },
+          "500" : {
+            "description" : "Service Unavailable",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/InternalServerErrors"
+                }
+              }
+            }
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ]
+      }
+    },
+    "/requests" : {
+      "get" : {
+        "tags" : [ "Schema Mapping" ],
+        "summary" : "Fetch Request Information.",
+        "description" : "This API will be leveraged by the UI to get the list and information of all  the request from time to time. A backend monitoring service will get the  status of the submitted request based on the original request ID, put by DIP  in the AXON topic. Whenever DIP puts any message in AXON topic meant for status  updates. This API will be executed and update the request by comparing the  request ID and storing its status in database. If there is any error then error  message will be returned. This API will fetch the information of all these  requests in IMP database at the moment.\n",
+        "operationId" : "fetchRequests",
+        "parameters" : [ {
+          "name" : "X-Authorization",
+          "in" : "header",
+          "description" : "Authorization Token - This is dummy for now. The name of this parameter and value is still to be decided after proper review of security implementation.",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "Accept",
+          "in" : "header",
+          "description" : "application/json",
+          "required" : false,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "filter",
+          "in" : "query",
+          "description" : "<p>Filter is comprised of a list of fields, which makes 'ANDED' filter criteria for the issuer for which files need to be retrieved. Fields  are separated by `;` and multi fields are provided as comma separated.</p> <p>Format:  /requests?offset=10&limit=5 </p> <ol>\n  <li> offset - For Pagination. The number of items to offset the start of the list from.</li>\n  <li> limit - For Pagination. The number of items you want the list to be limited to.</li>\n</ol>\n",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Success",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/Request"
+                  }
+                },
+                "example" : [ {
+                  "id" : "ZS33F3SZ3D",
+                  "campaign" : {
+                    "id" : 856755,
+                    "campaignId" : 76866755,
+                    "name" : "Dummy Campaign",
+                    "description" : "Dummy Description"
+                  },
+                  "error" : {
+                    "Source" : "<source>",
+                    "ReasonCode" : "<unique code>",
+                    "Description" : "The server cannot or will not process the request due to an apparent client error (e.g., malformed request syntax, size too large, invalid request message framing, or deceptive request routing).",
+                    "Recoverable" : "true/false",
+                    "Details" : "<Optional detailed description of the issue>"
+                  },
+                  "dipRequestId" : 68736583738,
+                  "status" : "submitted",
+                  "processingMessage" : "File has been recieved."
+                }, {
+                  "id" : "KS92F3OE3D",
+                  "campaign" : {
+                    "id" : 23439545,
+                    "campaignId" : 984385636,
+                    "name" : "Dummy Campaign",
+                    "description" : "Dummy Description"
+                  },
+                  "error" : {
+                    "Source" : "<source>",
+                    "ReasonCode" : "<unique code>",
+                    "Description" : "The server cannot or will not process the request due to an apparent client error (e.g., malformed request syntax, size too large, invalid request message framing, or deceptive request routing).",
+                    "Recoverable" : "true/false",
+                    "Details" : "<Optional detailed description of the issue>"
+                  },
+                  "dipRequestId" : 34546657438783,
+                  "status" : "submitted",
+                  "processingMessage" : "File has been recieved."
+                } ]
+              }
+            }
+          },
+          "400" : {
+            "description" : "Bad Request",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/BadRequestErrors"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Unauthorized",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/UnauthorizedErrors"
+                }
+              }
+            }
+          },
+          "403" : {
+            "description" : "Forbidden",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ForbiddenErrors"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Not Found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/NotFoundErrors"
+                }
+              }
+            }
+          },
+          "422" : {
+            "description" : "Unprocessable Entity",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/UnprocessableEntityErrors"
+                }
+              }
+            }
+          },
+          "500" : {
+            "description" : "Service Unavailable",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/InternalServerErrors"
+                }
+              }
+            }
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ]
+      }
+    }
+  },
+  "components" : {
+    "schemas" : {
+      "File" : {
+        "required" : [ "id", "issuerId" ],
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "integer",
+            "description" : "Unique ID of request.",
+            "readOnly" : true
+          },
+          "fileId" : {
+            "type" : "string",
+            "description" : "Unique file identifier.",
+            "readOnly" : true
+          },
+          "issuer" : {
+            "type" : "integer",
+            "description" : "The issuer for whom file will be fetched from File Exchange Service.",
+            "readOnly" : true
+          },
+          "schema" : {
+            "type" : "integer",
+            "description" : "The schema which will be fetched from File Exchange Service for File.",
+            "readOnly" : true
+          },
+          "name" : {
+            "type" : "string",
+            "description" : "The readable name of the File"
+          },
+          "description" : {
+            "type" : "string",
+            "description" : "The descriptionof the File"
+          },
+          "checksum" : {
+            "type" : "string",
+            "description" : "The checksum of the File"
+          },
+          "location" : {
+            "type" : "string",
+            "description" : "The location of the File"
+          },
+          "status" : {
+            "type" : "string",
+            "description" : "The status of the File on File Exchange Service"
+          },
+          "statusTime" : {
+            "type" : "string",
+            "description" : "The time of status of the File on File Exchange Service"
+          },
+          "metadata" : {
+            "type" : "string",
+            "description" : "The metadata of the File"
+          },
+          "contentType" : {
+            "type" : "string",
+            "description" : "The content Type of the File"
+          },
+          "fileProfile" : {
+            "type" : "string",
+            "description" : "The profile of the File"
+          },
+          "fileAliases" : {
+            "type" : "string",
+            "description" : "The aliase names of the File on file Exchange Service."
+          },
+          "type" : {
+            "type" : "string",
+            "description" : "The type of the file like issuer or mapping"
+          },
+          "format" : {
+            "type" : "string",
+            "description" : "The format of the file like CSV, TSV, TXT."
+          },
+          "size" : {
+            "type" : "integer",
+            "description" : "The size of the file in Bytes"
+          }
+        },
+        "example" : {
+          "id" : 4567743,
+          "fileId" : "84e1c83b-6bb0-382b-bc61-a7a06e9471ad",
+          "issuerId" : "settlement@boa",
+          "name" : "xyz.csv",
+          "description" : "The file is for dummy purpose.",
+          "checksum" : "DFGH3466FGHJHG",
+          "location" : "abc/fgh/xyz",
+          "status" : "complete",
+          "statustime" : "2018-04-29T20:15:33.000Z",
+          "metadata" : "The metadata from File Exchange Service.",
+          "contentType" : "TEXT",
+          "fileProfile" : "Dummy",
+          "fileAliases" : "Dummy",
+          "type" : "issuer",
+          "file" : "TBD",
+          "format" : "CSV",
+          "size" : 12345667
+        }
+      },
+      "Field" : {
+        "required" : [ "id" ],
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "integer",
+            "description" : "Unique ID of Field.",
+            "readOnly" : true
+          },
+          "name" : {
+            "type" : "string",
+            "description" : "The name of field.",
+            "readOnly" : true
+          },
+          "type" : {
+            "type" : "string",
+            "description" : "the type of field whether Text or Date.",
+            "readOnly" : true
+          }
+        }
+      },
+      "Schema" : {
+        "required" : [ "id" ],
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "integer",
+            "description" : "Unique ID of Schema.",
+            "readOnly" : true
+          },
+          "name" : {
+            "type" : "string",
+            "description" : "The name to be given to Schema."
+          },
+          "type" : {
+            "type" : "string",
+            "description" : "The type of Schema whether Source or Target."
+          },
+          "fields" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/Field"
+            }
+          }
+        }
+      },
+      "Request" : {
+        "required" : [ "campaign", "id" ],
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "integer",
+            "description" : "Unique ID of request.",
+            "readOnly" : true
+          },
+          "campaign" : {
+            "$ref" : "#/components/schemas/Campaign"
+          },
+          "error" : {
+            "$ref" : "#/components/schemas/Error"
+          },
+          "dipRequestId" : {
+            "type" : "string",
+            "description" : "Unique ID of the request that has been returned by DIP after submitting."
+          },
+          "status" : {
+            "type" : "string",
+            "description" : "Present status of submitted file at DIP."
+          },
+          "processingMessage" : {
+            "type" : "string",
+            "description" : "Message recieved from DIP while recieving the file."
+          }
+        },
+        "description" : "Request through which mapping file is submitted to DIP",
+        "example" : {
+          "id" : "ZS33F3SZ3D",
+          "campaign" : {
+            "id" : 856755,
+            "campaignId" : 76866755,
+            "name" : "Dummy Campaign",
+            "description" : "Dummy Description"
+          },
+          "error" : {
+            "Source" : "<source>",
+            "ReasonCode" : "<unique code>",
+            "Description" : "The server cannot or will not process the request due to an apparent client error (e.g., malformed request syntax, size too large, invalid request message framing, or deceptive request routing).",
+            "Recoverable" : "true/false",
+            "Details" : "<Optional detailed description of the issue>"
+          },
+          "dipRequestId" : 68736583738,
+          "status" : "submitted",
+          "processingMessage" : "File has been recieved."
+        }
+      },
+      "Campaign" : {
+        "required" : [ "id" ],
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "integer",
+            "description" : "Unique ID of Campaign.",
+            "readOnly" : true
+          },
+          "campaignId" : {
+            "type" : "string",
+            "description" : "The ID of Campaign linked with Campaign Application.",
+            "readOnly" : true
+          },
+          "name" : {
+            "type" : "string",
+            "description" : "The name of the Campaign.",
+            "readOnly" : true
+          },
+          "description" : {
+            "type" : "string",
+            "description" : "The full description of Campaign"
+          }
+        }
+      },
+      "Error" : {
+        "type" : "object",
+        "properties" : {
+          "Source" : {
+            "type" : "string",
+            "description" : "The source of error.",
+            "readOnly" : true
+          },
+          "ReasonCode" : {
+            "type" : "string",
+            "description" : "the reason code for error",
+            "readOnly" : true
+          },
+          "Description" : {
+            "type" : "string",
+            "description" : "The full description of error"
+          },
+          "Recoverable" : {
+            "type" : "boolean",
+            "description" : "Is it recoverable.",
+            "readOnly" : true
+          },
+          "Details" : {
+            "type" : "string",
+            "description" : "the details",
+            "readOnly" : true
+          }
+        }
+      },
+      "Errors" : {
+        "type" : "object",
+        "properties" : {
+          "Error" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/Error"
+            }
+          }
+        }
+      },
+      "BadRequestErrors" : {
+        "properties" : {
+          "errors" : {
+            "$ref" : "#/components/schemas/Errors"
+          }
+        },
+        "description" : "Bad Request",
+        "example" : {
+          "Errors" : {
+            "Error" : [ {
+              "Source" : "<source>",
+              "ReasonCode" : "<unique code>",
+              "Description" : "The server cannot or will not process the request due to an apparent client error (e.g., malformed request syntax, size too large, invalid request message framing, or deceptive request routing).",
+              "Recoverable" : "true/false",
+              "Details" : "<Optional detailed description of the issue>"
+            } ]
+          }
+        }
+      },
+      "UnauthorizedErrors" : {
+        "properties" : {
+          "errors" : {
+            "$ref" : "#/components/schemas/Errors"
+          }
+        },
+        "description" : "Unauthorized",
+        "example" : {
+          "Errors" : {
+            "Error" : [ {
+              "Source" : "<source>",
+              "ReasonCode" : "<unique code>",
+              "Description" : "Similar to 403 Forbidden, but specifically for use when authentication is required and has failed or has not yet been provided.",
+              "Recoverable" : "true/false",
+              "Details" : "<Optional detailed description of the issue>"
+            } ]
+          }
+        }
+      },
+      "ForbiddenErrors" : {
+        "properties" : {
+          "errors" : {
+            "$ref" : "#/components/schemas/Errors"
+          }
+        },
+        "description" : "Forbidden",
+        "example" : {
+          "Errors" : {
+            "Error" : [ {
+              "Source" : "<source>",
+              "ReasonCode" : "<unique code>",
+              "Description" : "The request was valid, but the server is refusing action. The user might not have the necessary permissions for a resource.",
+              "Recoverable" : "true/false",
+              "Details" : "<Optional detailed description of the issue>"
+            } ]
+          }
+        }
+      },
+      "NotFoundErrors" : {
+        "properties" : {
+          "errors" : {
+            "$ref" : "#/components/schemas/Errors"
+          }
+        },
+        "description" : "Not Found",
+        "example" : {
+          "Errors" : {
+            "Error" : [ {
+              "Source" : "<source>",
+              "ReasonCode" : "<unique code>",
+              "Description" : "The requested resource could not be found but may be available in the future. Subsequent requests by the client are permissible.",
+              "Recoverable" : "true/false",
+              "Details" : "<Optional detailed description of the issue>"
+            } ]
+          }
+        }
+      },
+      "UnprocessableEntityErrors" : {
+        "properties" : {
+          "errors" : {
+            "$ref" : "#/components/schemas/Errors"
+          }
+        },
+        "description" : "Unauthorized",
+        "example" : {
+          "Errors" : {
+            "Error" : [ {
+              "Source" : "<source>",
+              "ReasonCode" : "<unique code>",
+              "Description" : "The 422 (Unprocessable Entity) status code means the server understands the content type of the request entity (hence a 415(Unsupported Media Type) status code is inappropriate), and the syntax of the request entity is correct (thus a 400 (Bad Request) status code is inappropriate) but was unable to process the contained instructions. For example, this error condition may occur if an XML request body contains well-formed (i.e., syntactically correct), but semantically erroneous, XML instructions.",
+              "Recoverable" : "true/false",
+              "Details" : "<Optional detailed description of the issue>"
+            } ]
+          }
+        }
+      },
+      "InternalServerErrors" : {
+        "properties" : {
+          "errors" : {
+            "$ref" : "#/components/schemas/Errors"
+          }
+        },
+        "description" : "Unauthorized",
+        "example" : {
+          "Errors" : {
+            "Error" : [ {
+              "Source" : "<source>",
+              "ReasonCode" : "<unique code>",
+              "Description" : "<short description of the error",
+              "Recoverable" : "true/false",
+              "Details" : "<Optional detailed description of the issue>"
+            } ]
+          }
+        }
+      }
+    },
+    "responses" : {
+      "BadRequest" : {
+        "description" : "Bad Request",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "$ref" : "#/components/schemas/BadRequestErrors"
+            }
+          }
+        }
+      },
+      "Unauthorized" : {
+        "description" : "Unauthorized",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "$ref" : "#/components/schemas/UnauthorizedErrors"
+            }
+          }
+        }
+      },
+      "Forbidden" : {
+        "description" : "Forbidden",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "$ref" : "#/components/schemas/ForbiddenErrors"
+            }
+          }
+        }
+      },
+      "NotFound" : {
+        "description" : "Not Found",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "$ref" : "#/components/schemas/NotFoundErrors"
+            }
+          }
+        }
+      },
+      "Unprocessable" : {
+        "description" : "Unprocessable Entity",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "$ref" : "#/components/schemas/UnprocessableEntityErrors"
+            }
+          }
+        }
+      },
+      "ServiceUnavailable" : {
+        "description" : "Service Unavailable",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "$ref" : "#/components/schemas/InternalServerErrors"
+            }
+          }
+        }
+      }
+    },
+    "parameters" : {
+      "issuerIdParam" : {
+        "name" : "issuerId",
+        "in" : "path",
+        "description" : "Unique issuer identifier",
+        "required" : true,
+        "style" : "simple",
+        "explode" : false,
+        "schema" : {
+          "type" : "string"
+        }
+      },
+      "fileIdParam" : {
+        "name" : "fileId",
+        "in" : "path",
+        "description" : "Unique File identifier",
+        "required" : true,
+        "style" : "simple",
+        "explode" : false,
+        "schema" : {
+          "type" : "string"
+        }
+      },
+      "campaignIdParam" : {
+        "name" : "campaignId",
+        "in" : "path",
+        "description" : "Unique campaign identifier",
+        "required" : true,
+        "style" : "simple",
+        "explode" : false,
+        "schema" : {
+          "type" : "string"
+        }
+      },
+      "authTokenParam" : {
+        "name" : "X-Authorization",
+        "in" : "header",
+        "description" : "Authorization Token - This is dummy for now. The name of this parameter and value is still to be decided after proper review of security implementation.",
+        "required" : true,
+        "style" : "simple",
+        "explode" : false,
+        "schema" : {
+          "type" : "string"
+        }
+      },
+      "acceptParam" : {
+        "name" : "Accept",
+        "in" : "header",
+        "description" : "application/json",
+        "required" : false,
+        "style" : "simple",
+        "explode" : false,
+        "schema" : {
+          "type" : "string"
+        }
+      }
+    },
+    "securitySchemes" : {
+      "bearerAuth" : {
+        "type" : "http",
+        "scheme" : "bearer",
+        "bearerFormat" : "JWT"
+      }
+    }
+  }
+}
